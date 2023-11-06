@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import Card from '../../components/card/Card';
+import Loader from '../../components/loader/Loader'
+import { auth } from '../../firebase/config'
 import registerImg from '../../assets/register.png'
 import styles from './auth.module.scss';
 
@@ -11,6 +14,7 @@ const Register = () => {
     const [password, setPassword] = useState("")
     const [cPassword, setCPassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
 
     const registerUser = (e) => {
         e.preventDefault()
@@ -18,11 +22,28 @@ const Register = () => {
         if (password !== cPassword) {
             toast.error('Password does not match.')
         }
+        setIsLoading(true)
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed up 
+                const user = userCredential.user;
+                console.log(user);
+                setIsLoading(false)
+                toast.success('Registration successful...');
+                navigate('/login')
+                // ...
+            })
+            .catch((error) => {
+                toast.error(error.message)
+                setIsLoading(false)
+                // ..
+            });
+
     }
 
     return (
         <>
-            <ToastContainer />
+            {isLoading && <Loader />}
             <section className={`container ${styles.auth}`}>
                 <Card>
                     <div className={`${styles.form}`}>
