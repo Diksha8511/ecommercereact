@@ -18,6 +18,7 @@ const Login = () => {
     const provider = new GoogleAuthProvider();
 
     const signInWithGoogle = (e) => {
+        e.preventDefault()
         signInWithPopup(auth, provider)
             .then((result) => {
                 const user = result.user;
